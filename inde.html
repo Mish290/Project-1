@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Bromley FC – Carriera Allenatore FC26</title>
+
+<style>
+:root {
+  --bromley-red: #c8102e;
+  --bromley-black: #111;
+  --bromley-white: #fff;
+  --bromley-gray: #f2f2f2;
+  --transition: 0.3s;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bromley-gray);
+}
+
+header {
+  background: var(--bromley-red);
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header img { height: 45px; }
+
+nav {
+  display: flex;
+  gap: 20px;
+}
+
+nav a {
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+nav a.active, nav a:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page {
+  display: none;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.page.active { display: block; }
+
+h1, h2, h3 { color: var(--bromley-red); margin-top: 0; }
+
+button {
+  background: var(--bromley-red);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-right: 5px;
+}
+
+button:hover { opacity: 0.9; }
+
+.formation { margin-top: 20px; }
+
+.line {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+.player {
+  text-align: center;
+  background: #f7f7f7;
+  padding: 8px 6px;
+  border-radius: 6px;
+  min-width: 70px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 0.2s, background 0.3s;
+}
+
+.player:hover { transform: scale(1.05); }
+
+#outputImprevisto, #outputEstrazione, #outputCrisi, #mediaOutput {
+  margin-top: 10px;
+  font-weight: bold;
+  padding: 10px;
+  background: #f0f0f0;
+  border-radius: 6px;
+  min-height: 50px;
+}
+
+img.responsive { width: 100%; height: auto; border-radius: 8px; }
+
+table input { width: 100%; box-sizing: border-box; }
+
+th { cursor: pointer; }
+
+@keyframes fadeIn {
+  0% {opacity:0; transform: translateY(10px);}
+  100% {opacity:1; transform: translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <button class="icon-btn" onclick="showPage('home')">
+    <img src="bromley.jpg" alt="Home">
+  </button>
+  <nav>
+    <a onclick="showPage('imprevisti')">Imprevisti</a>
+    <a onclick="showPage('crisi')">Serie negativa</a>
+    <a onclick="showPage('overall')">Overall</a>
+    <a onclick="showPage('halloffame')">Hall of Fame</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <!-- HOME -->
+  <div id="home" class="page active">
+    <h1>Bromley FC – Manager Mode FC26</h1>
+    <p>Ogni scelta pesa. Ogni partita racconta qualcosa.</p>
+    <img src="stadio.jpg" class="responsive">
+  </div>
+
+  <!-- IMPREVISTI -->
+  <div id="imprevisti" class="page">
+    <h2>Imprevisti pre-partita</h2>
+    <button onclick="generaImprevisto()">🎲 Genera evento</button>
+    <div id="outputImprevisto"></div>
+
+    <h3>Estrazione giocatore</h3>
+    <label for="moduloImp">Seleziona modulo:</label>
+    <select id="moduloImp" onchange="creaFormazioneImprevisti()">
+      <option value="4-3-3">4-3-3</option>
+      <option value="4-2-3-1">4-2-3-1</option>
+      <option value="4-4-2">4-4-2</option>
+      <option value="3-5-2">3-5-2</option>
+      <option value="5-3-2">5-3-2</option>
+      <option value="4-1-4-1">4-1-4-1</option>
+      <option value="4-1-3-2">4-1-3-2</option>
+      <option value="4-2-3-1 STRETTO">4-2-3-1 STRETTO</option>
+      <option value="4-2-4">4-2-4</option>
+      <option value="4-2-2-2">4-2-2-2</option>
+      <option value="5-2-1-2">5-2-1-2</option>
+      <option value="5-2-3">5-2-3</option>
+    </select>
+
+    <div id="formazioneImp" class="formation"></div>
+    <button onclick="estraGiocatore()">Estrai giocatore</button>
+    <div id="outputEstrazione"></div>
+  </div>
+
+  <!-- CRISI -->
+  <div id="crisi" class="page">
+    <h2>Serie negativa</h2>
+    <button onclick="generaCrisi()">⚠️ Estrai scenario</button>
+    <div id="outputCrisi"></div>
+  </div>
+
+  <!-- OVERALL -->
+  <div id="overall" class="page">
+    <h2>Formazione e media overall</h2>
+    <select id="moduloOverall" onchange="creaFormazione('formazioneOverall','moduloOverall')">
+      <option value="4-3-3">4-3-3</option>
+      <option value="4-2-3-1">4-2-3-1</option>
+      <option value="4-4-2">4-4-2</option>
+      <option value="3-5-2">3-5-2</option>
+      <option value="5-3-2">5-3-2</option>
+      <option value="4-1-4-1">4-1-4-1</option>
+      <option value="4-1-3-2">4-1-3-2</option>
+      <option value="4-2-3-1 STRETTO">4-2-3-1 STRETTO</option>
+      <option value="4-2-4">4-2-4</option>
+      <option value="4-2-2-2">4-2-2-2</option>
+      <option value="5-2-1-2">5-2-1-2</option>
+      <option value="5-2-3">5-2-3</option>
+    </select>
+
+    <div id="formazioneOverall" class="formation"></div>
+    <button onclick="calcolaMedia('formazioneOverall','mediaOutput')">Calcola media</button>
+    <p id="mediaOutput"></p>
+  </div>
+
+  <!-- HALL OF FAME -->
+  <div id="halloffame" class="page">
+    <h2>Hall of Fame</h2>
+    <button onclick="aggiungiRiga()">➕ Aggiungi calciatore</button>
+    <button onclick="scegliCartella()">📁 Imposta cartella di lavoro</button>
+    <button onclick="salvaStat()">💾 Salva</button>
+
+    <table id="hofTable" border="1" cellpadding="6" cellspacing="0" style="margin-top:10px; border-collapse:collapse; width:100%;">
+      <thead style="background:#c8102e; color:white;">
+        <tr>
+          <th>Ruolo ⬍</th>
+          <th>Nome</th>
+          <th>Presenze</th>
+          <th>Gol</th>
+          <th>Assist</th>
+          <th>Cartellini Gialli</th>
+          <th>Cartellini Rossi</th>
+          <th>Clean Sheet</th>
+          <th>Voto Media</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+/* ================== NAV ================== */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  const navA = document.querySelector(`nav a[onclick*="${id}"]`);
+  if(navA) navA.classList.add('active');
+}
+
+/* ================== IMPREVISTI ================== */
+const imprevisti=[ /* ...lista eventi... */ ];
+
+function generaImprevisto(){
+  const output=document.getElementById("outputImprevisto");
+  const evento=imprevisti[Math.floor(Math.random()*imprevisti.length)];
+  output.innerHTML=`<h3>${evento.titolo}</h3><p>${evento.testo}</p>`;
+}
+
+const formazioni={
+"4-3-3":[["AS","ATT","AD"], ["CC","CC","CC"], ["TS","DC","DC","TD"], ["POR"]],
+"4-2-3-1":[["ATT"], ["AS","COC","AD"], ["CDC","CDC"], ["TS","DC","DC","TD"], ["POR"]],
+"4-4-2":[["ATT","ATT"], ["ES","CC","CC","ED"], ["TS","DC","DC","TD"], ["POR"]],
+"3-5-2":[["ATT","ATT"], ["ES","CC","CC","CC","ED"], ["DC","DC","DC"], ["POR"]],
+"5-3-2":[["ATT","ATT"], ["CC","CC","CC"], ["TS","DC","DC","DC","TD"], ["POR"]],
+"4-1-4-1":[["ATT"], ["ES","CC","CC","ED"], ["CDC"], ["TD","DC","DC","TS"], ["POR"]],
+"4-1-3-2":[["ATT","ATT"], ["ES","CC","ED"], ["CDC"], ["TD","DC","DC","TS"], ["POR"]],
+"4-2-3-1 STRETTO":[["ATT"], ["COC","COC","COC"], ["CDC","CDC"], ["TS","DC","DC","TD"], ["POR"]],
+"4-2-4":[["AS", "ATT", "ATT", "AD"], ["CC","CC"], ["TS","DC","DC", "TD"], ["POR"]],
+"4-2-2-2":[["ATT","ATT"], ["COC","COC"], ["CDC","CDC"], ["TS","DC","DC","TD"], ["POR"]],
+"5-2-1-2":[["ATT", "ATT"], ["COC"], ["CC", "CC"], ["TD","DC","DC", "DC","TS"], ["POR"]],
+"5-2-3":[["AS","ATT","AD"], ["CC","CC"], ["TD","DC","DC", "DC","TS"], ["POR"]]
+};
+
+function creaFormazioneImprevisti(){
+  const container=document.getElementById("formazioneImp");
+  container.innerHTML="";
+  const modulo=document.getElementById("moduloImp").value;
+  let playerNumber=11;
+
+  formazioni[modulo].forEach(linea=>{
+    const div=document.createElement("div");
+    div.className="line";
+    linea.forEach(pos=>{
+      const p=document.createElement("div");
+      p.className="player";
+      p.dataset.number=playerNumber;
+      p.innerHTML=`<strong>${pos}</strong><br>${playerNumber}`;
+      div.appendChild(p);
+      playerNumber--;
+    });
+    container.appendChild(div);
+  });
+}
+
+function estraGiocatore(){
+  const numero=Math.floor(Math.random()*11)+1;
+  document.getElementById("outputEstrazione").innerText=`Giocatore estratto: ${numero}`;
+  document.querySelectorAll("#formazioneImp .player").forEach(p=>p.style.background="#f7f7f7");
+  const player = document.querySelector(`#formazioneImp .player[data-number='${numero}']`);
+  if(player) player.style.background="#ff6961";
+}
+
+/* ================== CRISI ================== */
+const crisi=[ /* ...lista crisi... */ ];
+
+function generaCrisi(){
+  const c=crisi[Math.floor(Math.random()*crisi.length)];
+  document.getElementById("outputCrisi").innerHTML=`<h3>${c.titolo}</h3><p>${c.testo}</p>`;
+}
+
+/* ================== OVERALL ================== */
+function creaFormazione(containerId, selectId){
+  const container=document.getElementById(containerId);
+  container.innerHTML="";
+  const modulo=document.getElementById(selectId).value;
+  formazioni[modulo].forEach(linea=>{
+    const div=document.createElement("div");
+    div.className="line";
+    linea.forEach(pos=>{
+      const p=document.createElement("div");
+      p.className="player";
+      p.innerHTML=`<strong>${pos}</strong><br>OVR <input type="number" min="0" max="100">`;
+      div.appendChild(p);
+    });
+    container.appendChild(div);
+  });
+}
+
+function calcolaMedia(containerId, outputId){
+  const inputs=document.querySelectorAll(`#${containerId} input`);
+  let s=0,c=0;
+  inputs.forEach(i=>{if(i.value){s+=+i.value;c++;}});
+  document.getElementById(outputId).innerText=c?`Media squadra: ${(s/c).toFixed(2)}`:"Inserisci gli overall";
+}
+
+/* ================== HALL OF FAME ================== */
+const HOF_KEY="hallOfFameData";
+let directoryHandle = null;
+
+function aggiungiRiga(dati=null){
+  const tbody=document.getElementById('hofTable').querySelector('tbody');
+  const row=tbody.insertRow();
+  const colonne=['Ruolo','Nome','Presenze','Gol','Assist','Cartellini Gialli','Cartellini Rossi','Clean Sheet','Voto Media'];
+  colonne.forEach((col,i)=>{
+    const cell=row.insertCell();
+    const input=document.createElement('input');
+    if(i<=1){ input.type='text'; input.value=dati?dati[i]:""; }
+    else { 
+      input.type='number'; input.min=0; input.value=dati?Math.max(0,dati[i]):0;
+      input.addEventListener("input",()=>{ if(input.value<0 || input.value==="") input.value=0; });
+    }
+    cell.appendChild(input);
+  });
+}
+
+async function scegliCartella(){
+  directoryHandle = await window.showDirectoryPicker();
+  alert("Cartella impostata!");
+}
+
+async function salvaStat(){
+  if(!directoryHandle){ alert("Devi prima scegliere una cartella!"); return; }
+
+  ordinaPerRuolo();
+  const tbody=document.getElementById('hofTable').querySelector('tbody');
+  let data=[];
+  for(let r=0;r<tbody.rows.length;r++){
+    const row=tbody.rows[r];
+    let rowData=[];
+    for(let c=0;c<row.cells.length;c++){
+      let val=row.cells[c].querySelector('input').value;
+      if(c>=2) val=Math.max(0,val);
+      rowData.push(val);
+    }
+    data.push(rowData);
+  }
+
+  const txt=data.map(r=>r.join(', ')).join('\n');
+  const fileHandle=await directoryHandle.getFileHandle("hall_of_fame.txt",{create:true});
+  const writable=await fileHandle.createWritable();
+  await writable.write(txt);
+  await writable.close();
+  alert("File salvato nella tua cartella!");
+}
+
+function ordinaPerRuolo(){
+  const tbody=document.getElementById('hofTable').querySelector('tbody');
+  const rows=Array.from(tbody.rows);
+  rows.sort((a,b)=>{
+    const ruoloA=a.cells[0].querySelector("input").value.toLowerCase();
+    const ruoloB=b.cells[0].querySelector("input").value.toLowerCase();
+    return ruoloA.localeCompare(ruoloB);
+  });
+  rows.forEach(r=>tbody.appendChild(r));
+}
+
+/* ===== INIT ===== */
+creaFormazioneImprevisti();
+creaFormazione('formazioneOverall','moduloOverall');
+
+</script>
+
+</body>
+</html>
